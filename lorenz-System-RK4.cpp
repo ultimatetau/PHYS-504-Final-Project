@@ -107,43 +107,50 @@ std::vector<LorenzState> integrate_rk4(const double a, const double b, const dou
 	state1.y += dt*k0.y;
 	state1.z += dt*k0.z;
 	
-	state1.vx+= .25*k0.vx*dt;
-	state1.vy+=.25*k0.vy*dt;
-	state1.vz+=.25*k0.vz*dt;
+	state1.vx+=k0.vx*dt;
+	state1.vy+=k0.vy*dt;
+	state1.vz+=k0.vz*dt;
 	
 	auto k1 = rhs(state1);
+
+	state2 = state1;
 	
-	
-	state2.t += dt;
+	state2.t += .5*dt;
 	state2.x += dt*k1.x;
-	state2.y += dt*k1.y;  
+	state2.y += dt*k1.y;   
 	state2.z += dt*k1.z;
 	
-	state2.vx+=k1.vx*dt;
-	state2.vy+=k1.vy*dt;
-	state2.vz+=k1.vz*dt;
+	state2.vx+=.5*k1.vx*dt;
+	state2.vy+=.5*k1.vy*dt;
+	state2.vz+=.5*k1.vz*dt;
 
 	auto k2 = rhs(state2);
 
-	state.t += .5*dt;
-	state.x += .5*dt*k2.x;
-	state.y += .5*dt*k2.y;
-	state.z += .5*dt*k2.z;
+	state3 = state2;
 	
-	state.vx+=k2.vx*dt;
-	state.vy+=k2.vy*dt;
-	state.vz+=k2.vz*dt;
+	state3.t +=.5*dt;
+	state3.x += dt*k2.x;
+	state3.y += dt*k2.y;   
+	state3.z += dt*k2.z;
 
-	//auto k3 = rhs(state3);
+	state3.vx+=.5*k2.vx*dt;
+	state3.vy+=.5*k2.vy*dt;
+	state3.vz+=.5*k2.vz*dt;
 
-	//state.t += dt;
-	//state.x += .5*dt*k3.x;
-	//state.y += .5*dt*k3.y;
-	//state.z += .5*dt*k3.z;
 	
-	//state.vx+= .5*k3.vx*dt;
-	//state.vy+=.5*k3.vy*dt;
-	//state.vz+=.5*k3.vz*dt;
+	auto k3 = rhs(state);
+	state = state3;
+	
+	state.t +=dt;
+	state.x += dt*k3.x;
+	state.y += dt*k3.y;   
+	state.z += dt*k3.z;
+
+	state.vx+=k3.vx*dt;
+	state.vy+=k3.vy*dt;
+	state.vz+=k3.vz*dt;
+	
+
 	
 	o_history.push_back(state);
 	
@@ -160,14 +167,23 @@ std::vector<LorenzState> integrate_rk4(const double a, const double b, const dou
 int main()
 {
 
- double tmax = 100.0;
-    double dt = 0.01;
-    std::string his0 = "LorenzHistory.txt";
-
-    
-
-    auto orbit_history = integrate_rk4(1,1,1, tmax, dt);
-    write_history(orbit_history,his0);
+  double tmax;
+  double dt;
+  std::string his0 = "LorenzHistory.txt";
+  double x0,y0,z0;
+  std::cout<<"Please enter an initial value for x(include decimal): ";
+  std::cin >> x0;
+  std::cout<<"Please enter an initial value for y(include decimal): ";
+  std::cin >> y0;
+  std::cout<<"Please enter an initial value for z(include decimal): ";
+  std::cin >> z0;
+  std::cout<<"Please enter a time step: ";
+  std::cin >> dt;
+  std::cout<<"Please enter a total time: ";
+  std::cin >> tmax;
+  
+  auto orbit_history = integrate_rk4(x0,y0,z0, tmax, dt);
+  write_history(orbit_history,his0);
 
     
 }
